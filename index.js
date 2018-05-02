@@ -15,6 +15,10 @@ const DEFAULT_BG_COLOR = '#FAB913';
 const DEFAULT_TIME_TXT_COLOR = '#000';
 const DEFAULT_DIGIT_TXT_COLOR = '#000';
 const DEFAULT_TIME_TO_SHOW = ['D', 'H', 'M', 'S'];
+const DEFAULT_DAYS_TXT = 'Days';
+const DEFAULT_HOURS_TXT = 'Hours';
+const DEFAULT_MINUTES_TXT = 'Minutes';
+const DEFAULT_SECONDS_TXT = 'Seconds';
 
 class CountDown extends React.Component {
   static propTypes = {
@@ -22,6 +26,10 @@ class CountDown extends React.Component {
     digitTxtColor: PropTypes.string,
     timeTxtColor: PropTypes.string,
     timeToShow: PropTypes.array,
+    daysTxt: PropTypes.string,
+    hoursTxt: PropTypes.string,
+    minutesTxt: PropTypes.string,
+    secondsTxt: PropTypes.string,
     size: PropTypes.number,
     until: PropTypes.number,
     onFinish: PropTypes.func,
@@ -120,7 +128,7 @@ class CountDown extends React.Component {
   };
 
   renderCountDown = () => {
-    const {timeToShow} = this.props;
+    const {timeToShow, daysTxt, hoursTxt, minutesTxt, secondsTxt} = this.props;
     const {until} = this.state;
     const {days, hours, minutes, seconds} = this.getTimeLeft();
     const newTime = sprintf('%02d:%02d:%02d:%02d', days, hours, minutes, seconds).split(':');
@@ -131,10 +139,10 @@ class CountDown extends React.Component {
         style={styles.timeCont}
         onPress={this.props.onPress}
       >
-        {_.includes(timeToShow, 'D') ? this.renderDoubleDigits('Days', newTime[0]) : null}
-        {_.includes(timeToShow, 'H') ? this.renderDoubleDigits('Hours', newTime[1]) : null}
-        {_.includes(timeToShow, 'M') ? this.renderDoubleDigits('Minutes', newTime[2]) : null}
-        {_.includes(timeToShow, 'S') ? this.renderDoubleDigits('Seconds', newTime[3]) : null}
+        {_.includes(timeToShow, 'D') ? this.renderDoubleDigits(daysTxt, newTime[0]) : null}
+        {_.includes(timeToShow, 'H') ? this.renderDoubleDigits(hoursTxt, newTime[1]) : null}
+        {_.includes(timeToShow, 'M') ? this.renderDoubleDigits(minutesTxt, newTime[2]) : null}
+        {_.includes(timeToShow, 'S') ? this.renderDoubleDigits(secondsTxt, newTime[3]) : null}
       </Component>
     );
   };
@@ -153,6 +161,10 @@ CountDown.defaultProps = {
   digitTxtColor: DEFAULT_DIGIT_TXT_COLOR,
   timeTxtColor: DEFAULT_TIME_TXT_COLOR,
   timeToShow: DEFAULT_TIME_TO_SHOW,
+  daysTxt: DEFAULT_DAYS_TXT,
+  hoursTxt: DEFAULT_HOURS_TXT,
+  minutesTxt: DEFAULT_MINUTES_TXT,
+  secondsTxt: DEFAULT_SECONDS_TXT,
   until: 0,
   size: 15,
 };
