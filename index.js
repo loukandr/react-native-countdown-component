@@ -11,6 +11,7 @@ import {
 import _ from 'lodash';
 import {sprintf} from 'sprintf-js';
 
+const DEFAULT_CD_LABEL_TXT_COLOR = '#000';
 const DEFAULT_BG_COLOR = '#FAB913';
 const DEFAULT_TIME_TXT_COLOR = '#000';
 const DEFAULT_DIGIT_TXT_COLOR = '#000';
@@ -22,6 +23,11 @@ const DEFAULT_SECONDS_TXT = 'Seconds';
 
 class CountDown extends React.Component {
   static propTypes = {
+    cdCountingLabelTxt: PropTypes.string,
+    cdZeroTimerLabelTxt: PropTypes.string,
+    cdLabelTxtColor: PropTypes.string,
+    cdLabelFontFamily: PropTypes.string,
+    cdLabelSize: PropTypes.number,
     digitBgColor: PropTypes.string,
     digitTxtColor: PropTypes.string,
     timeTxtColor: PropTypes.string,
@@ -69,7 +75,12 @@ class CountDown extends React.Component {
     if (currentAppState === 'background') {
       this.setState({wentBackgroundAt: Date.now()});
     }
-  }
+  };
+
+  _onFinish = () => {
+    this.setState({until: 0});
+    this.renderLabel(this.props.cdZeroTimerLabelTxt);
+  };
 
   getTimeLeft = () => {
     const {until} = this.state;
@@ -88,8 +99,8 @@ class CountDown extends React.Component {
       clearInterval(this.timer);
       if (this.onFinish) {
         this.onFinish();
-        this.setState({until: 0});
       }
+      this._onFinish();
     } else {
       this.setState({until: until - 1});
     }
@@ -146,22 +157,39 @@ class CountDown extends React.Component {
     );
   };
 
+  renderLabel = (cdLabelTxt) => {
+    const {cdLabelTxtColor, cdLabelFontFamily, cdLabelSize, size, until} = this.props;
+
+    return (
+      <Text style={[
+        styles.cdLabelTxt,
+        {color: cdLabelTxtColor},
+        {fontFamily: cdLabelFontFamily},
+        {fontSize: cdLabelSize || size / 1.2},
+      ]}>
+        {cdLabelTxt}
+      </Text>
+    )
+  };
+
   renderCountDown = () => {
-    const {timeToShow, daysTxt, hoursTxt, minutesTxt, secondsTxt} = this.props;
+    const { cdCountingLabelTxt, cdZeroTimerLabelTxt, timeToShow, daysTxt, hoursTxt, minutesTxt, secondsTxt } = this.props;
     const {until} = this.state;
     const {days, hours, minutes, seconds} = this.getTimeLeft();
     const newTime = sprintf('%02d:%02d:%02d:%02d', days, hours, minutes, seconds).split(':');
     const Component = this.props.onPress ? TouchableOpacity : View;
 
     return (
-      <Component
-        style={styles.timeCont}
-        onPress={this.props.onPress}
-      >
-        {_.includes(timeToShow, 'D') ? this.renderDoubleDigits(daysTxt, newTime[0]) : null}
-        {_.includes(timeToShow, 'H') ? this.renderDoubleDigits(hoursTxt, newTime[1]) : null}
-        {_.includes(timeToShow, 'M') ? this.renderDoubleDigits(minutesTxt, newTime[2]) : null}
-        {_.includes(timeToShow, 'S') ? this.renderDoubleDigits(secondsTxt, newTime[3]) : null}
+      <Component onPress={this.props.onPress}>
+        <View style={styles.cdLabelCont}>
+          {this.renderLabel(until > 0 ? cdCountingLabelTxt : cdZeroTimerLabelTxt)}
+        </View>
+        <View style={styles.timeCont}>
+          {_.includes(timeToShow, 'D') ? this.renderDoubleDigits(daysTxt, newTime[0]) : null}
+          {_.includes(timeToShow, 'H') ? this.renderDoubleDigits(hoursTxt, newTime[1]) : null}
+          {_.includes(timeToShow, 'M') ? this.renderDoubleDigits(minutesTxt, newTime[2]) : null}
+          {_.includes(timeToShow, 'S') ? this.renderDoubleDigits(secondsTxt, newTime[3]) : null}
+        </View>
       </Component>
     );
   };
@@ -176,6 +204,7 @@ class CountDown extends React.Component {
 }
 
 CountDown.defaultProps = {
+  cdLabelTxtColor: DEFAULT_CD_LABEL_TXT_COLOR,
   digitBgColor: DEFAULT_BG_COLOR,
   digitTxtColor: DEFAULT_DIGIT_TXT_COLOR,
   timeTxtColor: DEFAULT_TIME_TXT_COLOR,
@@ -193,6 +222,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
   },
+  cdLabelCont: {
+    alignSelf: 'center',
+  },
+  cdLabelTxt: {
+    marginVertical: 3,
+  },
   timeTxt: {
     color: 'white',
     marginVertical: 2,
@@ -204,7 +239,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   digitCont: {
-
     borderRadius: 5,
     marginHorizontal: 2,
     alignItems: 'center',
