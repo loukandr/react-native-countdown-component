@@ -46,11 +46,17 @@ class CountDown extends React.Component {
       this.onFinish = _.once(this.props.onFinish);
     }
     this.timer = setInterval(this.updateTimer, 1000);
+    if (this.props.zeroTimerBlink) {
+      this.blinkTimer = setInterval(this.blinkTimer, 1000);
+    }
     AppState.addEventListener('change', this._handleAppStateChange);
   }
 
   componentWillUnmount() {
     clearInterval(this.timer);
+    if (this.props.zeroTimerBlink) {
+      clearInterval(this.blinkTimer);
+    }
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
@@ -89,6 +95,18 @@ class CountDown extends React.Component {
     }
   };
 
+  blinkTimer = () => {
+    const {until, digitTxtTransparent} = this.state;
+
+    if (!until) {
+      if (digitTxtTransparent) {
+        this.setState({digitTxtTransparent: null});
+      } else {
+        this.setState({digitTxtTransparent: 'transparent'});
+      }
+    }
+  };
+
   renderDigit = (d) => {
     const {digitBgColor, digitTxtColor, size} = this.props;
     return (
@@ -100,7 +118,8 @@ class CountDown extends React.Component {
         <Text style={[
           styles.digitTxt,
           {fontSize: size},
-          {color: digitTxtColor}
+          {color: digitTxtColor},
+          {color: this.state.digitTxtTransparent},
         ]}>
           {d}
         </Text>
