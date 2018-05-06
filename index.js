@@ -38,6 +38,7 @@ class CountDown extends React.Component {
     secondsTxt: PropTypes.string,
     size: PropTypes.number,
     until: PropTypes.number,
+    visibleWhenUntil: PropTypes.number,
     onFinish: PropTypes.func,
     onPress: PropTypes.func,
   };
@@ -171,19 +172,22 @@ class CountDown extends React.Component {
   };
 
   renderCountDown = () => {
-    const { cdCountingLabelTxt, cdZeroTimerLabelTxt, timeToShow, daysTxt, hoursTxt, minutesTxt, secondsTxt } = this.props;
+    const { visibleWhenUntil, cdCountingLabelTxt, cdZeroTimerLabelTxt,
+      timeToShow, daysTxt, hoursTxt, minutesTxt, secondsTxt } = this.props;
     const {until} = this.state;
     const {days, hours, minutes, seconds} = this.getTimeLeft();
     const newTime = sprintf('%02d:%02d:%02d:%02d', days, hours, minutes, seconds).split(':');
     const Component = this.props.onPress ? TouchableOpacity : View;
 
-    return (
+    return visibleWhenUntil < until ? (
+      <View />
+    ) : (
       <Component onPress={this.props.onPress}>
-        {(cdCountingLabelTxt || cdZeroTimerLabelTxt) &&
-        <View style={styles.cdLabelCont}>
-          {this.renderLabel(until > 0 ? cdCountingLabelTxt : cdZeroTimerLabelTxt)}
-        </View>
-        }
+        {(cdCountingLabelTxt || cdZeroTimerLabelTxt) && (
+          <View style={styles.cdLabelCont}>
+            {this.renderLabel(until > 0 ? cdCountingLabelTxt : cdZeroTimerLabelTxt)}
+          </View>
+        )}
         <View style={styles.timeCont}>
           {_.includes(timeToShow, 'D') ? this.renderDoubleDigits(daysTxt, newTime[0]) : null}
           {_.includes(timeToShow, 'H') ? this.renderDoubleDigits(hoursTxt, newTime[1]) : null}
