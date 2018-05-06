@@ -142,17 +142,15 @@ class CountDown extends React.Component {
     const {timeTxtColor, size} = this.props;
 
     return (
-      <View key={label} style={styles.doubleDigitCont}>
+      <View style={styles.doubleDigitCont}>
         <View style={styles.timeInnerCont}>
           {this.renderDigit(digits)}
         </View>
-        <Text style={[
-          styles.timeTxt,
-          {fontSize: size / 1.8},
-          {color: timeTxtColor},
-        ]}>
-          {label}
-        </Text>
+        {label ? (
+          <Text style={[styles.timeTxt, { fontSize: size / 1.8 }, { color: timeTxtColor }]}>{label}</Text>
+        ) : (
+          <View />
+        )}
       </View>
     );
   };
@@ -181,9 +179,11 @@ class CountDown extends React.Component {
 
     return (
       <Component onPress={this.props.onPress}>
+        {(cdCountingLabelTxt || cdZeroTimerLabelTxt) &&
         <View style={styles.cdLabelCont}>
           {this.renderLabel(until > 0 ? cdCountingLabelTxt : cdZeroTimerLabelTxt)}
         </View>
+        }
         <View style={styles.timeCont}>
           {_.includes(timeToShow, 'D') ? this.renderDoubleDigits(daysTxt, newTime[0]) : null}
           {_.includes(timeToShow, 'H') ? this.renderDoubleDigits(hoursTxt, newTime[1]) : null}
